@@ -1,8 +1,10 @@
-# AttrEncryptedAuthenticator
+# attr_encrypted_authenticator
 
-Problem: AttrEncrypted allows to easily handle encryption, but models with encrypted attributes lose the capability to automatically set attributes to the correct type, which is something useful when working, for example, with ActiveRecord and models initialized by form submition. This gem tries to restore that functionality.
+attr_encrypted allows to easily handle encryption, but models with encrypted attributes lose the capability to automatically set attributes to the correct type, which is something useful when working, for example, with active_record and models initialized by form submition. This gem tries to restore that functionality.
 
-Please note that even though this gem works with AttrEncrypted it doesn't depend on it, so you'll still need to install AttrEncrypted.
+Please note that even though this gem works with attr_encrypted it doesn't depend on it, so you'll need to add it youself.
+
+Also a big thanks to the guys that made attr_encrypted (homepage: https://github.com/attr-encrypted/attr_encrypted).
 
 Check section "Why & How" for more details.
 
@@ -22,28 +24,31 @@ Or install it yourself as:
 
 ## Usage
 
-Extend your model:
+Extend your model with attributes you want to encrypt:
 
     extend AttrEncryptedAuthenticator
 
-After that, add authenticator method after setting encrypted attributes, like this:
+Add attr_encrypted method for encrypted attributes, also don't forget to set marshal as true, or else you won't be able to retrieve attribute as the same that was set (according to documentation should be true by default when working with active_record, ):
 
-    attr_encrypted :start_date, :end_date, key: "some key"
-    attr_encrypted_authenticator :start_date, :end_date, authenticator: :date_time_or_default_nil
+    attr_encrypted :start_date, :end_date, key: "some key", marshal: true
 
-What this means is that when setting the value of attribute start_date, it will set the value after it was authenticated by a class called DateTimeOrDefaultNilAuthenticator (one of the default authenticator classes).
+The following line has to come after the calling attr_encrypted (since it overrides methods set by it):
 
-Also you may want to do your own logic after the value is set, so you may pass a callback that will be invoked for this effect:
+    attr_encrypted_authenticator :start_date, :end_date, authenticator: DateTimeOrDefaultNilAuthenticator
 
-    attr_encrypted_authenticator :start_date, authenticator: :date_time_or_default_nil, callback: :recalculate_duration
+Now every time "start_date" and "end_date" is set, the value is validated and converted so that it's a datetime (or nil in case it's a value not convertable with to_datetime method from active_support) before setting them.
+
+Also in case you want to aditional work after the value is set, you may pass the callback method name for that:
+
+    attr_encrypted_authenticator :start_date, authenticator: DateTimeOrDefaultNilAuthenticator, callback: :recalculate_duration
 
     def recalculate_duration
       # ...
     end
 
-We provide two base authenticator classes, DateTimeOrDefaultNilAuthenticator and BoolOrDefaultFalseAuthenticator, and you use them by setting the value of authenticator key to the underscore version of the name minus the authenticator portion:
+We provide two base authenticator classes, DateTimeOrDefaultNilAuthenticator and BoolOrDefaultFalseAuthenticator, and to use them just set them :
 
-    attr_encrypted_authenticator :rainy_day, authenticator: :bool_or_default_false
+    attr_encrypted_authenticator :rainy_day, authenticator: BoolOrDefaultFalseAuthenticator
 
 Besides the authenticators provided, you may also want to use your own authenticator, to do so just define a class that inherits from AuthenticatorBase, as follows:
 
@@ -55,7 +60,7 @@ Besides the authenticators provided, you may also want to use your own authentic
 
 Now just use it:
 
-    attr_encrypted_authenticator :first_name, authenticator: :custom, options: { titleize: true }
+    attr_encrypted_authenticator :first_name, authenticator: NameAuthenticator, options: { titleize: true }
 
 ## Why & How
 
@@ -74,7 +79,7 @@ So as a solution, what this gem does is to override the attribute setter, thus a
 
 to this:
 
-    set value -> do our job -> encrypt value and set to encrypted_attribute -> set value to attribute -> callback
+    set value -> execute authenticator -> encrypt value and set to encrypted_attribute -> set value to attribute -> callback
 
 That's about it.
 

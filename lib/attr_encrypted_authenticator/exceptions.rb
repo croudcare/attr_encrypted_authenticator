@@ -1,4 +1,4 @@
-module AttrEncryptedAuthenticator::Exceptions
+module AttrEncryptedAuthenticatorException
   class AttrEncryptedAuthenticatorStandardError < StandardError; end
 
   class AuthenticatorClassError < AttrEncryptedAuthenticatorStandardError; end

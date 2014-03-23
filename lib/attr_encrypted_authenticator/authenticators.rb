@@ -1,28 +1,39 @@
-require "attr_encrypted_authenticator/authenticator_base"
+require "attr_encrypted_authenticator/exceptions"
 require "active_support/all"
 
-module AttrEncryptedAuthenticator::Authenticators
-  class ::DateTimeOrDefaultNilAuthenticator < AttrEncryptedAuthenticator::AuthenticatorBase
-    def authenticate
-      val.to_datetime
-    rescue
-      nil
-    end
+class AttrEncryptedAuthenticator::AuthenticatorBase
+  attr_accessor :val, :options
+
+  def initialize(val, options)
+    self.val = val
+    self.options = options
   end
 
-  class ::BoolOrDefaultFalseAuthenticator < AttrEncryptedAuthenticator::AuthenticatorBase
-    TRUE_VALUES = [ '1', 't', 'true', 'on' ]
+  def authenticate
+    raise AttrEncryptedAuthenticatorExceptions::DefaultAuthenticateCalledError, "default authenticate method called, either you called it which isn't needed or it wasn't overridden"
+  end
+end
 
-    def authenticate
-      val_as_bool
-    rescue
-      false
-    end
+class DateTimeOrDefaultNilAuthenticator < AttrEncryptedAuthenticator::AuthenticatorBase
+  def authenticate
+    val.to_datetime
+  rescue
+    nil
+  end
+end
 
-  private
+class BoolOrDefaultFalseAuthenticator < AttrEncryptedAuthenticator::AuthenticatorBase
+  TRUE_VALUES = [ '1', 't', 'true', 'on' ]
 
-    def val_as_bool
-      TRUE_VALUES.include? val.to_s.downcase
-    end
+  def authenticate
+    val_as_bool
+  rescue
+    false
+  end
+
+private
+
+  def val_as_bool
+    TRUE_VALUES.include? val.to_s.downcase
   end
 end
