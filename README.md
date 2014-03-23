@@ -1,6 +1,6 @@
 # AttrEncryptedAuthenticator
 
-Problem: AttrEncrypted allows to easily handle encryption, yet when working with ActiveRecord we lose the convenience of type casting and have to validate by hand. This gem tries to keep that responsability in the model.
+Problem: AttrEncrypted allows to easily handle encryption, but models with encrypted attributes lose the capability to automatically set attributes to the correct type, which is something useful when working, for example, with ActiveRecord and models initialized by form submition. This gem tries to restore that functionality.
 
 Please note that even though this gem works with AttrEncrypted it doesn't depend on it, so you'll still need to install AttrEncrypted.
 
@@ -61,7 +61,7 @@ Now just use it:
 
 While working in a ror project I noticed that all the encrypted attributes were (obvioulsy) strings, which means that we lose the convenience of type convertion as when we are working with regular attributes.
 
-As and example, imagine that we have a model user that has a birth_date. Normally we would set this attribute as a datetime, and we would always work with a datetime, even if we set the value from a string. The following lines return a birth_date of type DateTime (nil on unconvertible value):
+As an example, imagine that we have a model "user" that has the attribute "birth_date". Normally we would set this attribute as a datetime, and we would always work with a datetime, even if we set the value from a string. The following lines return a birth_date of type DateTime (nil on unconvertible value):
 
     User.new(birth_date: "1981-12-12")
     user.birth_date = "1992-1-1"
