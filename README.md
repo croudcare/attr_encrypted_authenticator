@@ -46,16 +46,17 @@ Also in case you want to aditional work after the value is set, you may pass the
       # ...
     end
 
-We provide two base authenticator classes, DateTimeOrDefaultNilAuthenticator and BoolOrDefaultFalseAuthenticator, and to use them just set them :
+We provide two base authenticator classes, DateTimeOrDefaultNilAuthenticator and BoolOrDefaultFalseAuthenticator, and you use them by setting it as the value for the authenticator key:
 
     attr_encrypted_authenticator :rainy_day, authenticator: BoolOrDefaultFalseAuthenticator
 
-Besides the authenticators provided, you may also want to use your own authenticator, to do so just define a class that inherits from AuthenticatorBase, as follows:
+Besides the authenticators provided, you may also want create and use your own authenticator, to do so just define a class that inherits from AuthenticatorBase, as follows:
 
     class NameAuthenticator < AttrEncryptedAuthenticator::AuthenticatorBase
       def authenticate
-        # you have access to self.val, which is the value being set to attribute and an self.options which can be passed to attr_encrypted_authenticator method
-      end
+        # available instance attributes:
+        # value: this is the value that is being set
+        # options: in case you want to pass some aditional parameters to your authenticator, you may do so by providing them in the option key
     end
 
 Now just use it:
