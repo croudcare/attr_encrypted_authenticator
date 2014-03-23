@@ -28,7 +28,7 @@ Extend your model with attributes you want to encrypt:
 
     extend AttrEncryptedAuthenticator
 
-Add attr_encrypted method for encrypted attributes, also don't forget to set marshal as true, or else you won't be able to retrieve attribute as the same that was set (according to documentation should be true by default when working with active_record, ):
+Add attr_encrypted method for encrypted attributes, also don't forget to set marshal as true to save and load as the correct type (according to documentation should be true by default when working with active_record but didn't work for me using version 1.2.1):
 
     attr_encrypted :start_date, :end_date, key: "some key", marshal: true
 
